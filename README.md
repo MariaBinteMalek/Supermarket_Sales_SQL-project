@@ -324,7 +324,7 @@ Supermarket-Sales-SQL-Project/
 
 │ ├── 03\_Product\_Line\_Wise\_Sales\_Analysis.sql
 
-│ └── ... 
+│ └── ...  (22 SQL files)
 
 │
 
@@ -334,7 +334,7 @@ Supermarket-Sales-SQL-Project/
 
 │ ├── 02\_City\_Wise\_Sales\_Analysis.png
 
-│ └── ...
+│ └── ...(SQL result screenshots)
 
 │
 
