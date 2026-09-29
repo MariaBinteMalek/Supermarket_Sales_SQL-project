@@ -1,0 +1,247 @@
+SELECT*
+FROM `super-market-sales-data` LIMIT 5;
+
+--============================================================================================================================================================
+--1.Overall Business Analysis
+--============================================================================================================================================================
+SELECT
+SUM(Total) AS total_sales,
+SUM(cogs) AS total_cost,
+SUM(Quantity) AS total_quantity,
+SUM(`gross income`) As total_gross_income
+FROM `super-market-sales-data`;
+
+--==========================================================================================================================================================
+--2.City-wise Sales Analysis
+--==========================================================================================================================================================
+SELECT
+City,
+SUM(Total) AS total_sales,
+SUM(Quantity) AS total_quantity
+FROM `super-market-sales-data`
+GROUP BY City
+ORDER BY SUM(Total) DESC;
+
+--==========================================================================================================================================================
+--3.Product line wise Sales Analysis
+--==========================================================================================================================================================SELECT
+`Product line`,
+SUM(Total) AS total_sales,
+SUM(Quantity) AS total_quantity
+FROM `super-market-sales-data`
+GROUP BY `Product line`
+ORDER BY SUM(Total) DESC;
+--==========================================================================================================================================================
+--4.Gender-wise Sales Analysis
+--==========================================================================================================================================================
+SELECT
+Gender,
+SUM(Total) AS total_sales,
+SUM(Quantity) AS total_quantity
+FROM `super-market-sales-data`
+GROUP BY Gender
+ORDER BY SUM(Total) DESC;
+--==========================================================================================================================================================
+--5.Payment-wise Sales Analysis
+--==========================================================================================================================================================
+SELECT
+Payment,
+SUM(Total) AS total_sales,
+SUM(Quantity) AS total_quantity
+FROM `super-market-sales-data`
+GROUP BY Payment
+ORDER BY SUM(Total) DESC;
+--==========================================================================================================================================================
+--6.Customer Type-wise Sales Analysis
+--==========================================================================================================================================================
+SELECT
+`Customer type`,
+SUM(Total) AS total_sales,
+COUNT(*) AS total_transaction
+FROM `super-market-sales-data`
+GROUP BY `Customer type`
+ORDER BY SUM(Total) DESC;
+--==========================================================================================================================================================
+--7.Customer Type-average Sales Analysis
+--==========================================================================================================================================================
+SELECT
+`Customer type`,
+AVG(Total) AS average_sales
+FROM `super-market-sales-data`
+GROUP BY `Customer type`
+ORDER BY average_sales DESC;
+
+--==========================================================================================================================================================
+--8.Customer Type-quantity Sales Analysis
+--==========================================================================================================================================================
+SELECT
+`Customer type`,
+SUM(Quantity) AS total_quantity
+FROM `super-market-sales-data`
+GROUP BY `Customer type`
+ORDER BY total_quantity DESC;
+--==========================================================================================================================================================
+--9.Product line-average Sales Analysis
+--==========================================================================================================================================================
+SELECT
+`Product line`,
+AVG(Total) AS average_sales
+FROM `super-market-sales-data`
+GROUP BY `Product line`
+ORDER BY average_sales DESC;
+--==========================================================================================================================================================
+--10.Product line-quantity  Analysis
+--==========================================================================================================================================================
+SELECT
+`Product line`,
+SUM(Quantity) AS total_quantity
+FROM `super-market-sales-data`
+GROUP BY `Product line`
+ORDER BY total_quantity DESC;
+--==========================================================================================================================================================
+--11.Gender-average Sales Analysis
+--==========================================================================================================================================================
+SELECT
+Gender,
+AVG(Total) AS average_sales
+FROM `super-market-sales-data`
+GROUP BY Gender
+ORDER BY average_sales DESC;
+--==========================================================================================================================================================
+--12.Gender quantity  Analysis
+--==========================================================================================================================================================
+SELECT
+`Product line`,
+SUM(Quantity) AS total_quantity
+FROM `super-market-sales-data`
+GROUP BY `Product line`
+ORDER BY total_quantity DESC;
+
+--==========================================================================================================================================================
+--13.Payment method wise sales  Analysis
+--==========================================================================================================================================================
+SELECT
+Payment,
+SUM(Total) AS total_sales
+FROM `super-market-sales-data`
+GROUP BY Payment
+ORDER BY total_quantity DESC;
+--==========================================================================================================================================================
+--14.Payment method transaction
+--==========================================================================================================================================================
+SELECT
+Payment,
+COUNT(*) AS total_transactons
+FROM `super-market-sales-data`
+GROUP BY Payment
+ORDER BY total_transaction DESC;
+
+--==========================================================================================================================================================
+--15.Customer type sales Analysis
+--==========================================================================================================================================================
+SELECT
+`Customer type`
+SUM(Total) AS total_sales
+FROM `super-market-sales-data`
+GROUP BY `Customer type`
+ORDER BY total_sales DESC;
+--==========================================================================================================================================================
+--16.Customer type-wise transaction
+--==========================================================================================================================================================
+SELECT
+`Customer type`,
+COUNT(*) AS total_transactons
+FROM `super-market-sales-data`
+GROUP BY `Customer type`
+ORDER BY total_transaction DESC;
+--==========================================================================================================================================================
+--17.City_Product-line_Comparison
+--==========================================================================================================================================================
+SELECT
+City,
+`Product line`,
+SUM(Total) AS Total_Sales,
+SUM(Quantity) AS Total_Quantity,
+AVG(Total) AS Average_Sales
+FROM `super-market-sales-data`
+GROUP BY City, 'Product line`
+ORDER BY City,Total_Sales DESC;
+
+--==========================================================================================================================================================
+--18.Advance top Product line by city
+--==========================================================================================================================================================
+WITH city_product_sales AS (
+SELECT
+City,
+`Product line`,
+SUM(Total) AS Total_Sales
+FROM `super-market-sales-data`
+GROUP BY City, 'Product line`
+),
+ranked_product AS (
+SELECT
+City,
+`Product line`,
+Total_Sales,
+RANK() OVER(
+PARTITION BY City
+ORDER BY Total_Sales DESC
+) AS Sales_Rank
+FROM city_product_sales
+)
+SELECT
+City,
+`Product line`,
+`Total_Sales`,
+Sales_Rank
+FROM ranked_products
+WHERE Sales_Rank=1
+ORDER BY City;
+--==========================================================================================================================================================
+--19.Advance running total
+--==========================================================================================================================================================
+SELECT
+Date,
+SUM(Total) AS Daily_Sales,
+SUM(SUM(Total)) OVER (
+ORDER BY Date
+ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+) AS Running_Total_Sales
+FROM `super-market-sales-data`
+GROUP BY Date
+ORDER BY Date;
+--==========================================================================================================================================================
+--20.LAG Previous Sales
+--==========================================================================================================================================================
+SELECT
+`Invoice ID`,
+`Date`,
+`Total`,
+LAG(`Total`) OVER (ORDER BY `DATE','Invoice ID`)AS Previous_Sales
+FROM `super-market-sales-data`
+ORDER BY `Date', 'Invoice ID`;
+
+--==========================================================================================================================================================
+--21.LEAD NEXT Sales
+--==========================================================================================================================================================
+SELECT
+`Invoice ID`,
+`Date`,
+`Total`,
+LEAD(`Total`) OVER (ORDER BY `DATE','Invoice ID`)AS next_sales
+FROM `super-market-sales-data`
+ORDER BY `Date', 'Invoice ID`;
+--==========================================================================================================================================================
+--22. LAG_LEAD_Combined.png
+--==========================================================================================================================================================
+SELECT
+`Invoice ID`,
+`Date`,
+`Total`,
+LAG(`Total`) OVER (ORDER BY `DATE','Invoice ID`)AS Previous_sales,
+LEAD(`Total`) OVER (ORDER BY `DATE','Invoice ID`)AS next_sales
+FROM `super-market-sales-data`
+ORDER BY `Date', 'Invoice ID`;
+
+
+
